@@ -82,7 +82,7 @@ shinyServer(function(input, output) {
     )
 
     if (input$stopwords) {
-      stopword.list <- str_replace(input$ignore, "Remove common English words", "")
+      stopword.list <- str_split(input$ignore, "\\W|\\s") %>% unlist()
     } else {
       stopword.list <- NULL
     }
