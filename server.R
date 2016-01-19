@@ -119,7 +119,11 @@ shinyServer(function(input, output) {
     )
 
     if (input$stopwords) {
-      stopword.list <- str_split(input$ignore, "\\W|\\s") %>% unlist()
+      stopword.list <- input$ignore %>%
+        str_to_lower() %>%
+        str_replace_all("[\\n,]", " ") %>%
+        str_split("\\W|\\s") %>%
+        unlist()
     } else {
       stopword.list <- NULL
     }
@@ -134,8 +138,12 @@ shinyServer(function(input, output) {
     }
 
     if (input$fixCNS) {
-      input$words %>% cns_fix_input_text() %>%
+      input$words %>%
+        str_split("[\\n]") %>%
+        unlist() %>%
+        cns_fix_input_text() %>%
         str_to_lower() %>%
+        tolower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         mutate(word = cns_fix_word_freq(word)) %>%
@@ -145,6 +153,7 @@ shinyServer(function(input, output) {
     } else {
       input$words %>%
         str_to_lower() %>%
+        tolower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         filter(nchar(word) > 2) %>%
