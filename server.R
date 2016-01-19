@@ -29,6 +29,7 @@ cns.stopwords <- c("per", "will", "method", "of", "discovery", "condition", "des
 cns_fix_input_text <- function(x) {
   x %>%
     str_replace_all("\\n|\\r|\\\"|/", " ") %>%
+    str_replace_all("\\(|\\)", " ") %>%
     str_replace_all(cns_proc_regex, " ") %>%
     str_replace_all(cfr_regex, " ") %>%
     str_replace_all(cns_cr_regex, " ") %>%
@@ -54,7 +55,6 @@ cns_fix_input_text <- function(x) {
     str_replace_all("[ \\b]classificationcategory([abcdwq])[ -]([trendcboa]{5})[ \\b]",
                     " classificationcategory\\1\\2 ") %>%
     str_replace_all("\\\\", " ") %>%
-    str_replace_all("\\(|\\)", " ") %>%
     str_replace_all("\\s{1,}", " ")
 }
 
