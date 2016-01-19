@@ -52,7 +52,8 @@ cns_fix_input_text <- function(x) {
     str_replace_all("[\\b ]g[\\. ]?e[\\. ]?(h?)[\\b ]", " generalelectric\\1 ") %>%
     str_replace_all("[ \\b]cat[ \\\"\\(-]{1,}([abcdwq])(?:[\\\"\\)])?(?:[[:punct:]]([HL])[[:punct:]])?[\\b \\.]", " classificationcategory\\1\\2 ") %>%
     str_replace_all("[ \\b]classificationcategory([abcdwq])[ -]([trendcboa]{5})[ \\b]",
-                    " classificationcategory\\1\\2 ")
+                    " classificationcategory\\1\\2 ") %>%
+    str_to_lower()
 }
 
 # Fixes text after processing so that it is displayed correctly
@@ -141,6 +142,7 @@ shinyServer(function(input, output) {
                       min.freq = ifelse(nrow(.) > 50, 3, 2))
     } else {
       input$words %>%
+        str_to_lower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         MakeWordcloud(color.set = color.pal, max.words = input$nWords,
