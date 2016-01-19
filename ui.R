@@ -35,7 +35,7 @@ wordcloud_panel <- tabPanel(
             sliderInput("nWords", "Maximum words to include",
                         min = 25, max = 200, value = 50, step = 25),
             selectInput("palette", "Color Options",
-                        choices = c("Dark" = "Dark2", "Paired" = "Paired",
+                        choices =  c("Dark" = "Dark2", "Paired" = "Paired",
                                     "Rainbow" = "Set1", "Grey" = "Greys"))
           )
         ),
