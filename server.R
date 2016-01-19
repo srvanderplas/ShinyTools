@@ -29,6 +29,7 @@ cns.stopwords <- c("per", "will", "method", "of", "discovery", "condition", "des
 cns_fix_input_text <- function(x) {
   x %>%
     str_replace_all("\\n|\\r|\\\"|/", " ") %>%
+    str_replace_all("\\(|\\)", " ") %>%
     str_replace_all(cns_proc_regex, " ") %>%
     str_replace_all(cfr_regex, " ") %>%
     str_replace_all(cns_cr_regex, " ") %>%
