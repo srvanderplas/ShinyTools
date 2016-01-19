@@ -54,7 +54,9 @@ cns_fix_input_text <- function(x) {
     str_replace_all("[ \\b]cat[ \\\"\\(-]{1,}([abcdwq])(?:[\\\"\\)])?(?:[[:punct:]]([HL])[[:punct:]])?[\\b \\.]", " classificationcategory\\1\\2 ") %>%
     str_replace_all("[ \\b]classificationcategory([abcdwq])[ -]([trendcboa]{5})[ \\b]",
                     " classificationcategory\\1\\2 ") %>%
-    str_to_lower()
+    str_replace_all("\\\\", " ") %>%
+    str_replace_all("\\(|\\)", " ") %>%
+    str_replace_all("\\s{1,}", " ")
 }
 
 # Fixes text after processing so that it is displayed correctly
@@ -140,11 +142,8 @@ shinyServer(function(input, output) {
 
     if (input$fixCNS) {
       input$words %>%
-        str_split("[\\n]") %>%
-        unlist() %>%
+        str_split("(\\n{1,})") %>%
         cns_fix_input_text() %>%
-        str_to_lower() %>%
-        tolower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         mutate(word = cns_fix_word_freq(word)) %>%
@@ -153,8 +152,8 @@ shinyServer(function(input, output) {
                       min.freq = ifelse(nrow(.) > 50, 3, 2))
     } else {
       input$words %>%
+        str_split("(\\n{1,})") %>%
         str_to_lower() %>%
-        tolower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         filter(nchar(word) > 2) %>%
