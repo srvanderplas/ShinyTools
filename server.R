@@ -151,7 +151,7 @@ shinyServer(function(input, output) {
         filter(nchar(word) > 2)
 
         MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
-                      min.freq = ifelse(nrow(.) > 50, 2, 1))
+                      min.freq = 1)
     } else {
       df <- input$words %>%
         str_split("(\\n{1,})") %>%
@@ -163,7 +163,7 @@ shinyServer(function(input, output) {
         filter(nchar(word) > 2)
 
       MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
-                    min.freq = ifelse(nrow(.) > 50, 2, 1))
+                    min.freq = 1)
     }
   })
 
