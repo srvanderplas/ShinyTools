@@ -135,6 +135,7 @@ shinyServer(function(input, output) {
 
     if (input$fixCNS) {
       input$words %>% cns_fix_input_text() %>%
+        str_to_lower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         mutate(word = cns_fix_word_freq(word)) %>%
