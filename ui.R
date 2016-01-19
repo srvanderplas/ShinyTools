@@ -18,22 +18,23 @@ wordcloud_panel <- tabPanel(
             5,
             tags$label("Wordcloud text"),
             br(),
-            tags$textarea(id = "words", style = "min-width:100%; min-height = 100px;",
-                          placeholder = "Input text here", maxlength = 25000,
-                          rows = 8, cols = 40, autofocus = T)
+            tags$textarea(id = "words", style = "min-width:100%; min-height = 200px;",
+                          rows = 8,
+                          placeholder = "Input text here (paste from external document/table)",
+                          maxlength = 25000, autofocus = T)
           ),
           column(
             3,
             tags$label("List of words to ignore"),
-            tags$textarea(id = "ignore", rows = 4, cols = 20,
+            tags$textarea(id = "ignore", rows = 6,
                           style = "min-width:100%;",
-                          placeholder = "Ignored words", maxlength = 5000),
+                          placeholder = "Ignored words (Separate words by spaces, commas, etc.)", maxlength = 5000),
             helpText("Words with 1 or 2 characters are ignored by default.")
           ),
           column(
             4,
             sliderInput("nWords", "Maximum words to include",
-                        min = 25, max = 200, value = 50, step = 25),
+                        min = 25, max = 300, value = 50, step = 25),
             selectInput("palette", "Color Options",
                         choices =  c("Dark" = "Dark2", "Paired" = "Paired",
                                     "Rainbow" = "Set1", "Grey" = "Greys"))
