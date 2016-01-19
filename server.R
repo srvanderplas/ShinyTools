@@ -150,7 +150,7 @@ shinyServer(function(input, output) {
         mutate(word = cns_fix_word_freq(word)) %>%
         filter(nchar(word) > 2) %>%
         MakeWordcloud(color.set = color.pal, max.words = input$nWords,
-                      min.freq = ifelse(nrow(.) > 50, 3, 2))
+                      min.freq = ifelse(nrow(.) > 50, 2, 1))
     } else {
       input$words %>%
         str_split("(\\n{1,})") %>%
@@ -161,7 +161,7 @@ shinyServer(function(input, output) {
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         filter(nchar(word) > 2) %>%
         MakeWordcloud(color.set = color.pal, max.words = input$nWords,
-                      min.freq = ifelse(nrow(.) > 50, 3, 2))
+                      min.freq = ifelse(nrow(.) > 50, 2, 1))
     }
   })
 
