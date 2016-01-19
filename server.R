@@ -55,7 +55,6 @@ cns_fix_input_text <- function(x) {
     str_replace_all("[ \\b]classificationcategory([abcdwq])[ -]([trendcboa]{5})[ \\b]",
                     " classificationcategory\\1\\2 ") %>%
     str_replace_all("\\\\", " ") %>%
-    str_replace_all("\\(|\\)", " ") %>%
     str_replace_all("\\s{1,}", " ")
 }
 
