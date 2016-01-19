@@ -142,6 +142,8 @@ shinyServer(function(input, output) {
     if (input$fixCNS) {
       input$words %>%
         str_split("(\\n{1,})") %>%
+        unlist() %>%
+        as.character() %>%
         cns_fix_input_text() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
@@ -152,6 +154,8 @@ shinyServer(function(input, output) {
     } else {
       input$words %>%
         str_split("(\\n{1,})") %>%
+        unlist() %>%
+        as.character() %>%
         str_to_lower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
@@ -159,17 +163,6 @@ shinyServer(function(input, output) {
         MakeWordcloud(color.set = color.pal, max.words = input$nWords,
                       min.freq = ifelse(nrow(.) > 50, 3, 2))
     }
-
-    data <- str_split(input$words, "\\n") %>%
-      unlist() %>%
-      as.character()
-
-    data <- data %>%
-      MakeWordFreq(stopword.list = stopword.list,
-                   stem = input$stem,
-                   rm.stopwords = input$stopwords) %>%
-      MakeWordcloud(color.set = color.pal, max.words = input$nWords)
-
   })
 
 })
