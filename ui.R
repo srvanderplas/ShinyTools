@@ -11,7 +11,7 @@ wordcloud_panel <- tabPanel(
   "Word Clouds",
   fluidRow(
     column(
-      10, offset = 1,
+      12,
       wellPanel(
         fluidRow(
           column(
@@ -26,7 +26,7 @@ wordcloud_panel <- tabPanel(
           column(
             3,
             tags$label("List of words to ignore"),
-            tags$textarea(id = "ignore", rows = 4,
+            tags$textarea(id = "ignore", rows = 6,
                           style = "min-width:100%;",
                           placeholder = "Ignored words (Separate words by spaces, commas, etc.)", maxlength = 5000),
             helpText("Words with 1 or 2 characters are ignored by default.")
@@ -36,7 +36,6 @@ wordcloud_panel <- tabPanel(
             selectInput("palette", "Color Options",
                         choices =  c("Dark" = "Dark2", "Paired" = "Paired",
                                      "Rainbow" = "Set1", "Grey" = "Greys")),
-            br(),
             checkboxInput(inputId = "stem", "Remove word stems?", value = T),
             helpText("Word stems, such as -s, -ed, -ing, are removed.",
                      "Words are replaced with the most common variant which appears in the text."),
@@ -46,11 +45,12 @@ wordcloud_panel <- tabPanel(
             helpText("Words like: the, our, who, whom, have, has")
           )
         ),
+        br(),
         fluidRow(
           column(
             4,
             sliderInput("nWords", "Maximum words to include:",
-                        min = 25, max = 300, value = 50, step = 25)
+                        min = 25, max = 500, value = 300, step = 25)
           ),
           column(
             4,
@@ -59,7 +59,7 @@ wordcloud_panel <- tabPanel(
           ),
           column(
             4,
-            sliderInput("wordFreq", "Words must appear this many times:",
+            sliderInput("wordFreq", "Words must appear this many times in the text:",
                         min = 1, max = 10, value = 1, step = 1)
           )
         ),
@@ -83,7 +83,7 @@ wordcloud_panel <- tabPanel(
       8, offset = 2,
       div(
         style = "margin: auto; display:table;",
-        plotOutput("wordcloud", width = "600px", height = "600px")
+        plotOutput("wordcloud", width = "450px", height = "450px")
       )
     )
   )
