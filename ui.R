@@ -26,36 +26,51 @@ wordcloud_panel <- tabPanel(
           column(
             3,
             tags$label("List of words to ignore"),
-            tags$textarea(id = "ignore", rows = 6,
+            tags$textarea(id = "ignore", rows = 4,
                           style = "min-width:100%;",
                           placeholder = "Ignored words (Separate words by spaces, commas, etc.)", maxlength = 5000),
             helpText("Words with 1 or 2 characters are ignored by default.")
           ),
           column(
             4,
-            sliderInput("nWords", "Maximum words to include",
-                        min = 25, max = 300, value = 50, step = 25),
             selectInput("palette", "Color Options",
                         choices =  c("Dark" = "Dark2", "Paired" = "Paired",
-                                    "Rainbow" = "Set1", "Grey" = "Greys"))
+                                     "Rainbow" = "Set1", "Grey" = "Greys")),
+            br(),
+            checkboxInput(inputId = "stem", "Remove word stems?", value = T),
+            helpText("Word stems, such as -s, -ed, -ing, are removed.",
+                     "Words are replaced with the most common variant which appears in the text."),
+
+            checkboxInput(inputId = "stopwords",
+                          "Remove common words", value = T),
+            helpText("Words like: the, our, who, whom, have, has")
           )
         ),
         fluidRow(
           column(
             4,
-            checkboxInput(inputId = "stopwords",
-                          "Remove common English words", value = T),
-            helpText("Words like: the, our, who, whom, have, has"),
-            br(),
-            checkboxInput(inputId = "stem", "Remove word stems?", value = T),
-            helpText("Word stems, such as -s, -ed, -ing, are removed.",
-                     "Words are replaced with the most common variant which appears in the text.")
+            sliderInput("nWords", "Maximum words to include:",
+                        min = 25, max = 300, value = 50, step = 25)
           ),
           column(
-            8,
+            4,
+            sliderInput("wordSize", "Words must be at least this long:",
+                        min = 1, max = 10, value = 2, step = 1)
+          ),
+          column(
+            4,
+            sliderInput("wordFreq", "Words must appear this many times:",
+                        min = 1, max = 10, value = 1, step = 1)
+          )
+        ),
+        fluidRow(
+          column(
+            6,
             checkboxInput(inputId = "fixCNS", "Fix CNS-related words?", value = F),
-            helpText("Capitalizes common acronyms, prevents \"operator\" and \"operations\" from being grouped with words like \"operate(d)\", and removes work order numbers, procedure numbers, and CR references from the base text."),
-            br(),
+            helpText("Capitalizes common acronyms, prevents \"operator\" and \"operations\" from being grouped with words like \"operate(d)\", and removes work order numbers, procedure numbers, and CR references from the base text.")
+          ),
+          column(
+            6,
             checkboxInput(inputId = "CNSstopwords", "Remove common CNS CR words", value = F),
             helpText("Words such as \"condition\", \"description\", \"attached/attachment\", \"CNS\"")
           )

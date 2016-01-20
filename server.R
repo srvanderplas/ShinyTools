@@ -11,7 +11,11 @@ library(stringr)
 library(magrittr)
 library(dplyr)
 library(RColorBrewer)
-library(nppd)
+# library(nppd)
+library(wordcloud)
+
+source("./Code/WordcloudFunctions.R")
+
 
 # --- CNS specific functions ---------------------------------------------------
 
@@ -148,10 +152,10 @@ shinyServer(function(input, output) {
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
         mutate(word = cns_fix_word_freq(word)) %>%
-        filter(nchar(word) > 2)
+        filter(nchar(word) > input$wordSize)
 
         MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
-                      min.freq = 1)
+                      min.freq = wordFreq)
     } else {
       df <- input$words %>%
         str_split("(\\n{1,})") %>%
@@ -160,10 +164,10 @@ shinyServer(function(input, output) {
         str_to_lower() %>%
         MakeWordFreq(stopword.list = stopword.list,
                      stem = input$stem, rm.stopwords = input$stopwords) %>%
-        filter(nchar(word) > 2)
+        filter(nchar(word) > input$wordSize)
 
       MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
-                    min.freq = 1)
+                    min.freq = wordFreq)
     }
   })
 
