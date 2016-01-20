@@ -140,7 +140,7 @@ shinyServer(function(input, output) {
 
     color.pal <- brewer.pal(6, input$palette)
     if (input$palette == "Greys") {
-      color.pal <- brewer.pal(8, input$palette)[-c(1:2)]
+      color.pal <- rev(brewer.pal(9, input$palette)[-c(1:3)])
     }
 
     if (input$fixCNS) {
