@@ -1,4 +1,3 @@
-
 # This is the server logic for a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -11,10 +10,10 @@ library(stringr)
 library(magrittr)
 library(dplyr)
 library(RColorBrewer)
-# library(nppd)
-library(wordcloud)
+library(nppd)
+# library(wordcloud)
 
-source("./Code/WordcloudFunctions.R")
+# source("./Code/WordcloudFunctions.R")
 
 
 # --- CNS specific functions ---------------------------------------------------
@@ -116,7 +115,81 @@ collapse_values <- function(x){
 
 # ------------------------------------------------------------------------------
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
+
+  warning.msgs <- reactiveValues(list = NULL)
+
+  observe({
+    if ("words" %in% names(input))
+      session$sendCustomMessage(
+        type = "shinySetValues",
+        message = ""
+      )
+  })
+
+  formatStopwords <- reactive({
+    if (input$stopwords) {
+      input$ignore %>%
+        str_to_lower() %>%
+        str_replace_all("[\\n,]", " ") %>%
+        str_split("\\W|\\s") %>%
+        unlist()
+    } else {
+      NULL
+    }
+  })
+
+  stopwordList <- reactive({
+    stopword.list <- formatStopwords()
+    if (input$CNSstopwords) {
+      stopword.list <- c(stopword.list, cns.stopwords)
+    }
+    stopword.list
+  })
+
+  formatWords <- reactive({
+    if (nchar(input$words) > 0) {
+      if (input$fixCNS) {
+        input$words %>%
+          str_split("(\\n{1,})") %>%
+          unlist() %>%
+          as.character() %>%
+          cns_fix_input_text() %>%
+          MakeWordFreq(stopword.list = stopwordList(),
+                       stem = input$stem, rm.stopwords = input$stopwords) %>%
+          mutate(word = cns_fix_word_freq(word)) %>%
+          filter(nchar(word) > input$wordSize)
+      } else {
+        input$words %>%
+          str_split("(\\n{1,})") %>%
+          unlist() %>%
+          as.character() %>%
+          str_to_lower() %>%
+          MakeWordFreq(stopword.list = stopwordList(),
+                       stem = input$stem, rm.stopwords = input$stopwords) %>%
+          filter(nchar(word) > input$wordSize)
+      }
+    } else {
+      data.frame(word = rep("", 0), freq = rep(0, 0), stringsAsFactors = F) %>% as_data_frame()
+    }
+  })
+
+
+  wordPlot <- reactive({
+    color.pal <- brewer.pal(6, input$palette)
+    if (input$palette == "Greys") {
+      color.pal <- rev(brewer.pal(9, input$palette)[-c(1:3)])
+    }
+
+    df <- formatWords()
+
+    MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
+                  min.freq = input$wordFreq)
+
+    warning.msgs$list <- names(warnings()) %>%
+      str_replace("(.*) could not be fit on page\\. It will not be plotted\\.",
+                  "\\1 did not fit and was not plotted.")
+  })
 
   output$wordcloud <- renderPlot({
     validate(
@@ -124,51 +197,48 @@ shinyServer(function(input, output) {
            "Please paste text into the box labeled \"Wordcloud text\".")
     )
 
-    if (input$stopwords) {
-      stopword.list <- input$ignore %>%
-        str_to_lower() %>%
-        str_replace_all("[\\n,]", " ") %>%
-        str_split("\\W|\\s") %>%
-        unlist()
-    } else {
-      stopword.list <- NULL
-    }
+    print(wordPlot())
+    message(paste(names(warnings()), collapse = "\n"))
 
-    if (input$CNSstopwords) {
-      stopword.list <- c(stopword.list, cns.stopwords)
-    }
+  })
 
-    color.pal <- brewer.pal(6, input$palette)
-    if (input$palette == "Greys") {
-      color.pal <- rev(brewer.pal(9, input$palette)[-c(1:3)])
-    }
+  output$testtext <- renderText(paste("     fingerprint: ", input$fingerprint, "     ip: ", input$ipid))
 
-    if (input$fixCNS) {
-      df <- input$words %>%
-        str_split("(\\n{1,})") %>%
-        unlist() %>%
-        as.character() %>%
-        cns_fix_input_text() %>%
-        MakeWordFreq(stopword.list = stopword.list,
-                     stem = input$stem, rm.stopwords = input$stopwords) %>%
-        mutate(word = cns_fix_word_freq(word)) %>%
-        filter(nchar(word) > input$wordSize)
+  observe({
+    tmp <- formatWords()
+    sw <- formatStopwords()
 
-        MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
-                      min.freq = input$wordFreq)
-    } else {
-      df <- input$words %>%
-        str_split("(\\n{1,})") %>%
-        unlist() %>%
-        as.character() %>%
-        str_to_lower() %>%
-        MakeWordFreq(stopword.list = stopword.list,
-                     stem = input$stem, rm.stopwords = input$stopwords) %>%
-        filter(nchar(word) > input$wordSize)
-
-      MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
-                    min.freq = input$wordFreq)
+    if (nrow(tmp) > 0) {
+      cat(
+        paste0(
+          paste(
+            Sys.time(),
+            input$ipid,
+            input$fingerprint,
+            sum(tmp$freq),
+            nrow(tmp),
+            length(sw),
+            input$stem,
+            input$stopwords,
+            input$CNSstopwords,
+            input$fixCNS,
+            input$nWords,
+            input$wordSize,
+            input$wordFreq,
+            input$palette,
+            sep = ", "
+          ),
+          "\n"),
+        file = "userInfo.txt",
+        append = T
+      )
     }
   })
 
+  output$warningMessages <- renderTable({
+    if (length(warning.msgs$list) > 0) {
+      data.frame(matrix(warning.msgs$list, ncol = 2), stringsAsFactors = F) %>%
+        set_names(c("Warnings", ""))
+    }
+  }, include.rownames = F)
 })

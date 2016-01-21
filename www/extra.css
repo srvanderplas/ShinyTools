@@ -8,6 +8,10 @@
   margin-bottom:5px;
 }
 
-.well {
+#inputwell {
   background-color:#cfcfcf;
+}
+
+#warningMessages table tr td {
+  color: #FF0000;
 }

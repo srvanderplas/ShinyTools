@@ -1,4 +1,3 @@
-
 # This is the user-interface definition of a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -7,12 +6,35 @@
 
 library(shiny)
 
+# --- User ID functions --------------------------------------------------------
+
+inputUserid <- function(inputId, value='') {
+  #   print(paste(inputId, "=", value))
+  tagList(
+    singleton(tags$head(tags$script(src = "md5.js", type = 'text/javascript'))),
+    singleton(tags$head(tags$script(src = "shinyBindings.js", type = 'text/javascript'))),
+    # tags$body(onload="setvalues()"),
+    tags$input(id = inputId, class = "userid", value = as.character(value), type = "text", style = "display:none;")
+  )
+}
+
+inputIp <- function(inputId, value=''){
+  tagList(
+    singleton(tags$head(tags$script(src = "md5.js", type = 'text/javascript'))),
+    singleton(tags$head(tags$script(src = "shinyBindings.js", type = 'text/javascript'))),
+    # tags$body(onload="setvalues()"),
+    tags$input(id = inputId, class = "ipaddr", value = as.character(value), type = "text", style = "display:none;")
+  )
+}
+
+# --- Wordcloud Panel ----------------------------------------------------------
 wordcloud_panel <- tabPanel(
   "Word Clouds",
   fluidRow(
     column(
       12,
       wellPanel(
+        id = "inputwell",
         fluidRow(
           column(
             5,
@@ -80,21 +102,32 @@ wordcloud_panel <- tabPanel(
   ),
   fluidRow(
     column(
-      8, offset = 2,
+      6, offset = 1,
       div(
         style = "margin: auto; display:table;",
         plotOutput("wordcloud", width = "450px", height = "450px")
       )
+    ),
+    column(
+      4,
+      tableOutput("warningMessages")
     )
   )
 )
 
+# --- Header -------------------------------------------------------------------
+headerPanel <- tagList(
+  includeCSS("www/extra.css"),
+  inputIp("ipid"),
+  inputUserid("fingerprint")
+)
 
+# --- Shiny UI Function --------------------------------------------------------
 shinyUI(
   navbarPage(
     title = "Analysis Tools",
     theme = "bootstrap.css",
-    header = includeCSS("www/extra.css"),
+    header = headerPanel,
     inverse = TRUE,
     wordcloud_panel
   )
