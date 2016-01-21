@@ -9,12 +9,21 @@ library(tm)
 library(stringr)
 library(magrittr)
 library(dplyr)
+library(xtable)
 library(RColorBrewer)
 library(nppd)
 # library(wordcloud)
 
 # source("./Code/WordcloudFunctions.R")
-
+withWarnings <- function(expr) {
+  myWarnings <- NULL
+  wHandler <- function(w) {
+    myWarnings <<- c(myWarnings, str_replace(w$message, "(.*) could not be .*", "\\1"))
+    invokeRestart("muffleWarning")
+  }
+  val <- withCallingHandlers(expr, warning = wHandler)
+  list(value = val, warnings = myWarnings)
+}
 
 # --- CNS specific functions ---------------------------------------------------
 
@@ -117,8 +126,6 @@ collapse_values <- function(x){
 
 shinyServer(function(input, output, session) {
 
-  warning.msgs <- reactiveValues(list = NULL)
-
   observe({
     if ("words" %in% names(input))
       session$sendCustomMessage(
@@ -183,13 +190,13 @@ shinyServer(function(input, output, session) {
 
     df <- formatWords()
 
-    MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
-                  min.freq = input$wordFreq)
-
-    warning.msgs$list <- names(warnings()) %>%
-      str_replace("(.*) could not be fit on page\\. It will not be plotted\\.",
-                  "\\1 did not fit and was not plotted.")
+    withWarnings(
+      MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
+                    min.freq = input$wordFreq)
+    )
   })
+
+  warning.msgs <- reactiveValues(list = NULL)
 
   output$wordcloud <- renderPlot({
     validate(
@@ -197,9 +204,10 @@ shinyServer(function(input, output, session) {
            "Please paste text into the box labeled \"Wordcloud text\".")
     )
 
-    print(wordPlot())
-    message(paste(names(warnings()), collapse = "\n"))
-
+    wp <- wordPlot()
+    print(wp$value)
+    warning.msgs$list <- wp$warnings
+    # message(paste(names(warnings()), collapse = "\n"))
   })
 
   output$testtext <- renderText(paste("     fingerprint: ", input$fingerprint, "     ip: ", input$ipid))
@@ -235,10 +243,17 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  output$warningMessages <- renderTable({
-    if (length(warning.msgs$list) > 0) {
-      data.frame(matrix(warning.msgs$list, ncol = 2), stringsAsFactors = F) %>%
-        set_names(c("Warnings", ""))
+  output$warningMessages <- renderUI({
+    wl <- warning.msgs$list %>% unlist() %>% as.character()
+    if (length(wl) > 0) {
+      tt <- data.frame(matrix(wl, ncol = min(length(wl), 4)), stringsAsFactors = F) %>%
+        xtable() %>% print.xtable(include.rownames = F, include.colnames = F, type = 'html') %>%
+        HTML()
+
+      tagList(
+        h3("Warning: The following words would not fit within the boundaries"),
+        tt
+      )
     }
-  }, include.rownames = F)
+  })
 })

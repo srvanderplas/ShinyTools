@@ -1,5 +1,5 @@
 .help-block {
-  font-size:75%;
+  font-size:90%;
   margin-bottom:2px;
   margin-top:2px;
 }
@@ -8,10 +8,26 @@
   margin-bottom:5px;
 }
 
-#inputwell {
-  background-color:#cfcfcf;
+#warningMessages table {
+  margin:auto;
+  border:#F00;
 }
 
 #warningMessages table tr td {
   color: #FF0000;
+  border:0;
+  padding-top:2px;
+  padding-bottom:2px;
+  padding-left:5px;
+  padding-right:5px;
+  margin:auto;
+}
+
+#wordcloud {
+  margin: auto;
+}
+
+.shiny-output-error-validation {
+  font-size:150%;
+  text-align:center;
 }
