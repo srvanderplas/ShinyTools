@@ -12,6 +12,7 @@ library(dplyr)
 library(xtable)
 library(RColorBrewer)
 library(nppd)
+library(gridGraphics)
 # library(wordcloud)
 
 # source("./Code/WordcloudFunctions.R")
@@ -138,7 +139,7 @@ shinyServer(function(input, output, session) {
     if (input$stopwords) {
       input$ignore %>%
         str_to_lower() %>%
-        str_replace_all("[\\n,]", " ") %>%
+        str_replace_all(string = ., pattern = "[\\n,]", replacement = " ") %>%
         str_split("\\W|\\s") %>%
         unlist()
     } else {
@@ -190,10 +191,24 @@ shinyServer(function(input, output, session) {
 
     df <- formatWords()
 
-    withWarnings(
+    # Clean device
+    p <- recordPlot()
+    plot.new()
+    p
+
+    # Draw plot
+    wp1 <- withWarnings(
       MakeWordcloud(x = df, color.set = color.pal, max.words = input$nWords,
                     min.freq = input$wordFreq)
     )
+
+    # grab the plot as a grid object
+    grid.echo()
+    a <- grid.grab()
+
+    wp1$value <- a
+
+    wp1
   })
 
   warning.msgs <- reactiveValues(list = NULL)
@@ -211,6 +226,24 @@ shinyServer(function(input, output, session) {
   })
 
   output$testtext <- renderText(paste("     fingerprint: ", input$fingerprint, "     ip: ", input$ipid))
+
+  output$downloadPlot <- downloadHandler(
+    filename = function() {
+      fname <- str_replace_all(input$filename, "[\"\\*\\/\\>\\<\\?\\!\\.:\\\\\\|]{1,}", " ") %>%
+        str_trim()
+      paste(fname, '.png', sep='')
+    },
+    content = function(file) {
+      wp2 <- wordPlot()
+
+      ggsave(filename = file,
+             plot = wp2$value,
+             width = input$imgwidth,
+             height = input$imgwidth,
+             units = "in",
+             dpi = 300)
+    }
+  )
 
   observe({
     tmp <- formatWords()

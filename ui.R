@@ -109,6 +109,22 @@ wordcloud_panel <- tabPanel(
             )
           )
         )
+      ),
+      br(),
+      wellPanel(
+        h3("Download Wordcloud"),
+        fluidRow(
+          column(
+            6,
+            textInput(inputId = "filename", label = "File Name (no extension)", value = "wordcloud")
+          ),
+          column(
+            6,
+            numericInput(inputId = "imgwidth", label = "Image Width/Height (in)",
+                         value = 6, min = 3, max = 9, step = .25)
+          )
+        ),
+        downloadButton("downloadPlot", label = "Download", class = 'btn btn-info')
       )
     ),
     column(
