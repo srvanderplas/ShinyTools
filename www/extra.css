@@ -23,10 +23,32 @@
   margin:auto;
 }
 
+#warningMessages2 table {
+  margin:auto;
+  border:#F00;
+}
+
+#warningMessages2 table tr td {
+  color: #FF0000;
+  border:0;
+  padding-top:2px;
+  padding-bottom:2px;
+  padding-left:5px;
+  padding-right:5px;
+  margin:auto;
+}
+
 #wordcloud {
   margin: auto;
 }
 
+.shiny-plot-output img{
+  border:2px black solid;
+}
+
+#comparisoncloud {
+  margin: auto;
+}
 .shiny-output-error-validation {
   font-size:150%;
   text-align:center;

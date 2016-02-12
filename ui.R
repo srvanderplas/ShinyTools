@@ -54,7 +54,8 @@ inputIp <- function(inputId, value=''){
 
 # --- Wordcloud Panel ----------------------------------------------------------
 wordcloud_panel <- tabPanel(
-  "Word Clouds",
+  title = "Word Clouds",
+  value = "wordCloud",
   fluidRow(
     column(
       4,
@@ -81,7 +82,9 @@ wordcloud_panel <- tabPanel(
             sliderInput("wordSize", "Words must be at least this long:",
                         min = 1, max = 10, value = 2, step = 1),
             sliderInput("wordFreq", "Words must appear __ times in the text:",
-                        min = 1, max = 10, value = 1, step = 1)
+                        min = 1, max = 10, value = 1, step = 1),
+            sliderInput("textSize", "Text size range:",
+                        min = .1, max = 5, value = c(.2, 3.5), step = .1)
           ),
           column(
             6,
@@ -132,8 +135,115 @@ wordcloud_panel <- tabPanel(
       plotOutput("wordcloud", width = "450px", height = "450px"),
       br(),
       div(
-        class = "hidden-xs hidden-sm",
+        class = "hidden-xs",
         uiOutput("warningMessages")
+      )
+    )
+  )
+)
+
+# --- Comparison/Commonality Cloud Panel ---------------------------------------
+comparisoncloud_panel <- tabPanel(
+  title = "Comparison Clouds",
+  value = "comparisonCloud",
+  fluidRow(
+    column(
+      4,
+      wellPanel(
+        radioButtons("wcType", "Wordcloud Type:",
+                     choices = c("Comparison - show words more common in one text than the other" = 1,
+                                 "Commonality - show words common to both texts" = 2),
+                     inline = F
+        ),
+        br(),
+        tags$label("Wordcloud text"),
+        br(),
+        fluidRow(
+          column(
+            6,
+            textInput(inputId = "title1", label = "Text is from:", placeholder = "Some set of documents"),
+            tags$textarea(id = "words1", style = "min-width:100%; min-height = 200px;",
+                          rows = 8,
+                          placeholder = "Input first set of text here (paste from external document/table)",
+                          maxlength = 25000, autofocus = T)
+          ),
+          column(
+            6,
+            textInput(inputId = "title2", label = "Text is from:", placeholder = "A different set of documents"),
+            tags$textarea(id = "words2", style = "min-width:100%; min-height = 200px;",
+                          rows = 8,
+                          placeholder = "Input second set of text here (paste from external document/table)",
+                          maxlength = 25000, autofocus = T)
+          )
+        ),
+        tags$label("List of words to ignore"),
+        tags$textarea(id = "ignore2", rows = 2,
+                      style = "min-width:100%;",
+                      placeholder = "Ignored words (Separate words by spaces, commas, etc.)", maxlength = 5000),
+        br(),
+        fluidRow(
+          style = "padding-top:25px;",
+          column(
+            6,
+            style = "padding-right:15px;",
+            sliderInput("nWords2", "Include up to __ words:",
+                        min = 25, max = 520, value = 300, step = 25),
+            sliderInput("wordSize2", "Words must be at least this long:",
+                        min = 1, max = 10, value = 2, step = 1),
+            sliderInput("textSize2", "Text size range:",
+                        min = .1, max = 5, value = c(.2, 3.5), step = .1)
+          ),
+          column(
+            6,
+            style = "padding-left:15px;",
+            selectInput("palette2", "Color Options",
+                          choices =  c("Dark" = "Dark2", "Paired" = "Paired",
+                                       "Rainbow" = "Set1", "Grey" = "Greys")),
+            br(),
+            checkboxInputPopover(
+              inputId = "stem2", title = "Remove word stems?", value = T,
+              popoverContent = HTML("Stems are common endings, like -s, -ed, and -ing. <br/> Words are replaced with the most common variant in the text that has the same stem.")),
+            checkboxInputPopover(
+              inputId = "stopwords2", title = "Remove common words", value = T,
+              popoverContent = "e.g. the, our, who, whom, have, has"),
+            br(),
+            checkboxInputPopover(
+              inputId = "fixCNS2",
+              title = "Fix CNS-related words?",
+              popoverContent =
+                HTML("Performs the following operations: <ul><li>Capitalizes common acronyms</li><li>prevents \"operator\" and \"operations\" from being grouped with words like \"operate(d)\"</li><li>removes work order numbers, procedure numbers, and CR references from the text</li></ul>")
+            ),
+            checkboxInputPopover(
+              inputId = "CNSstopwords2", title = "Remove common CNS CR words", value = F,
+              popoverContent = "Words such as \"condition\", \"description\", \"attached/attachment\", \"CNS\""
+            )
+          )
+        )
+      ),
+      br(),
+      wellPanel(
+        h3("Download Wordcloud"),
+        fluidRow(
+          column(
+            6,
+            textInput(inputId = "filename2", label = "File Name (no extension)", value = "wordcloud")
+          ),
+          column(
+            6,
+            numericInput(inputId = "imgwidth2", label = "Image Width/Height (in)",
+                         value = 6, min = 3, max = 9, step = .25)
+          )
+        ),
+        downloadButton("downloadcomparisonPlot", label = "Download", class = 'btn btn-info')
+      )
+    ),
+    column(
+      8,
+      plotOutput("comparisoncloud", width = "450px", height = "450px"),
+      br(),
+      div(
+        class = "hidden-xs hidden-sm",
+        uiOutput("warningMessages2")
       )
     )
   )
@@ -152,8 +262,10 @@ shinyUI(
   navbarPage(
     title = "Analysis Tools",
     theme = "bootstrap.css",
+    id = "tab",
     header = headerPanel,
     inverse = TRUE,
-    wordcloud_panel
+    wordcloud_panel,
+    comparisoncloud_panel
   )
 )
