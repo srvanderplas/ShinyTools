@@ -597,4 +597,11 @@ shinyServer(function(input, output, session) {
       )
     }
   })
+
+  output$interpretation <- renderUI({
+    tagList(
+      h3("Interpreting Wordclouds"),
+      p("Word clouds are graphical representations of word frequency which give greater prominence to words that appear more frequently in the source text. This type of visualization facilitates exploratory textual analysis by  identifying words that frequently appear in a set of comments, documents, or source text. Wordclouds may also provide a visual aid to communicate broad themes from textual information.")
+    )
+  })
 })
