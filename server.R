@@ -484,71 +484,71 @@ shinyServer(function(input, output, session) {
     }
   )
 
-  # # Observe tab 1
-  # observe({
-  #   tmp <- formatWords()
-  #   sw <- formatStopwords(input$ignore, input$stopwords)
-  # 
-  #   if (nrow(tmp) > 0) {
-  #     cat(
-  #       paste0(
-  #         paste(
-  #           Sys.time(),
-  #           input$ipid,
-  #           input$fingerprint,
-  #           sum(tmp$freq),
-  #           nrow(tmp),
-  #           length(sw),
-  #           input$stem,
-  #           input$stopwords,
-  #           input$CNSstopwords,
-  #           input$fixCNS,
-  #           input$nWords,
-  #           input$wordSize,
-  #           input$wordFreq,
-  #           input$palette,
-  #           "Tab1",
-  #           sep = ", "
-  #         ),
-  #         "\n"),
-  #       file = "userInfo.txt",
-  #       append = T
-  #     )
-  #   }
-  # })
-  # 
-  # # Observe tab 2
-  # observe({
-  #   tmp <- formatWords2()
-  #   sw <- formatStopwords(input$ignore2, input$stopwords2)
-  # 
-  #   if (nrow(tmp) > 0) {
-  #     cat(
-  #       paste0(
-  #         paste(
-  #           Sys.time(),
-  #           input$ipid,
-  #           input$fingerprint,
-  #           sum(colSums(tmp)),
-  #           nrow(tmp),
-  #           length(sw),
-  #           input$stem2,
-  #           input$stopwords2,
-  #           input$CNSstopwords2,
-  #           input$fixCNS2,
-  #           input$nWords2,
-  #           input$wordSize2,
-  #           input$wordFreq2,
-  #           input$palette2,
-  #           "Tab2",
-  #           sep = ", "
-  #         ),
-  #         "\n"),
-  #       file = "userInfo.txt",
-  #       append = T
-  #     )
-  #   }
-  # })
+  # Observe tab 1
+  observe({
+    tmp <- formatWords()
+    sw <- formatStopwords(input$ignore, input$stopwords)
+
+    if (nrow(tmp) > 0) {
+      cat(
+        paste0(
+          paste(
+            Sys.time(),
+            input$ipid,
+            input$fingerprint,
+            sum(tmp$freq),
+            nrow(tmp),
+            length(sw),
+            input$stem,
+            input$stopwords,
+            input$CNSstopwords,
+            input$fixCNS,
+            input$nWords,
+            input$wordSize,
+            input$wordFreq,
+            input$palette,
+            "Tab1",
+            sep = ", "
+          ),
+          "\n"),
+        file = "userInfo.txt",
+        append = T
+      )
+    }
+  })
+
+  # Observe tab 2
+  observe({
+    tmp <- formatWords2()
+    sw <- formatStopwords(input$ignore2, input$stopwords2)
+
+    if (nrow(tmp) > 0) {
+      cat(
+        paste0(
+          paste(
+            Sys.time(),
+            input$ipid,
+            input$fingerprint,
+            sum(colSums(tmp)),
+            nrow(tmp),
+            length(sw),
+            input$stem2,
+            input$stopwords2,
+            input$CNSstopwords2,
+            input$fixCNS2,
+            input$nWords2,
+            input$wordSize2,
+            input$wordFreq2,
+            input$palette2,
+            "Tab2",
+            sep = ", "
+          ),
+          "\n"),
+        file = "userInfo.txt",
+        append = T
+      )
+    }
+  })
 
   output$warningMessages <- renderUI({
     wl <- warning.msgs$list %>% unlist() %>% as.character()
