@@ -65,7 +65,8 @@ wordcloud_panel <- tabPanel(
         tags$textarea(id = "words", style = "min-width:100%; min-height = 200px;",
                       rows = 8,
                       placeholder = "Input text here (paste from external document/table)",
-                      maxlength = 1000000, autofocus = T),
+                      # maxlength = 500000,
+                      autofocus = T),
         br(),
         tags$label("List of words to ignore"),
         tags$textarea(id = "ignore", rows = 2,
@@ -87,11 +88,11 @@ wordcloud_panel <- tabPanel(
     column(
       5,
       plotOutput("wordcloud", width = "450px", height = "450px"),
-      br(),
-      div(
-        class = "hidden-xs",
-        uiOutput("warningMessages")
-      )
+      br()#,
+      # div(
+      #   class = "hidden-xs",
+      #   uiOutput("warningMessages")
+      # )
     ),
     column(
       3,
@@ -159,7 +160,8 @@ comparisoncloud_panel <- tabPanel(
             tags$textarea(id = "words1", style = "min-width:100%; min-height = 200px;",
                           rows = 8,
                           placeholder = "Input first set of text here (paste from external document/table)",
-                          maxlength = 25000, autofocus = T)
+                          # maxlength = 25000, 
+                          autofocus = T)
           ),
           column(
             6,
@@ -167,7 +169,8 @@ comparisoncloud_panel <- tabPanel(
             tags$textarea(id = "words2", style = "min-width:100%; min-height = 200px;",
                           rows = 8,
                           placeholder = "Input second set of text here (paste from external document/table)",
-                          maxlength = 25000, autofocus = T)
+                          # maxlength = 25000, 
+                          autofocus = T)
           )
         ),
         tags$label("List of words to ignore"),
@@ -181,7 +184,7 @@ comparisoncloud_panel <- tabPanel(
             6,
             style = "padding-right:15px;",
             sliderInput("nWords2", "Include up to __ words:",
-                        min = 25, max = 520, value = 300, step = 25),
+                        min = 25, max = 1000, value = 300, step = 25),
             sliderInput("wordSize2", "Words must be at least this long:",
                         min = 1, max = 10, value = 2, step = 1),
             sliderInput("textSize2", "Text size range:",
